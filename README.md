@@ -1,6 +1,6 @@
 # ✈️ Airline Passenger Satisfaction Prediction
 
-[![Streamlit App](https://img.shields.io/badge/🚀_Live_App-Streamlit-red)](https://streamlit.io)
+[![Streamlit App](https://img.shields.io/badge/🚀_Live_App-Streamlit-red)](https://airline-satisfaction-bud32c8ha6cepksarswkxp.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Best Model](https://img.shields.io/badge/🏆_Best_Model-Gradient_Boosting_96.3%25-brightgreen)](https://github.com)
