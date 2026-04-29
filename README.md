@@ -205,7 +205,16 @@ Include deep learning (MLP) comparison
 Add more feature selection methods (RFE, L1)
 Create API endpoint for predictions
 
-# 👩‍💻 Author
-Your Name – Data Science Project
-📧 your.email@example.com
-🔗 GitHub
+# 👥 Team Members
+
+- **Howida Waheed Khater**  
+  *Data Tidying, Data Cleaning, Data Visualization*
+
+- **Merna Adel Saad**  
+  *Feature Extraction, Modeling*
+
+- **Hadeer Ayman Elbandary**  
+  *Feature Selection, Modeling*
+
+- **Yasmin Ali Abdelghany**  
+  *Data Imbalance Handling, Data Visualization*
