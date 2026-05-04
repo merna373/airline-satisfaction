@@ -1,6 +1,3 @@
-# app.py (separate Preprocessing and Modeling tabs)
-# Run: streamlit run app.py
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -36,20 +33,18 @@ def load_data(uploaded_train, uploaded_test):
     if uploaded_train is not None:
         train = pd.read_csv(uploaded_train)
     else:
-        train = pd.read_csv("train.csv")  # fallback if file exists
+        train = pd.read_csv("train.csv")  
     if uploaded_test is not None:
         test = pd.read_csv(uploaded_test)
     else:
         test = pd.read_csv("test.csv")
     
-    # drop unnecessary columns
     for df in [train, test]:
         if 'Unnamed: 0' in df.columns:
             df.drop(columns=['Unnamed: 0'], inplace=True)
         if 'id' in df.columns:
             df.drop(columns=['id'], inplace=True)
     
-    # Add binary target column
     train = add_binary_target(train)
     test = add_binary_target(test)
     
@@ -77,16 +72,16 @@ def encode_features(df):
 def feature_engineering_pipeline(train_df, test_df):
     train_df = create_new_features(train_df)
     test_df = create_new_features(test_df)
-    # class average feature
+
     class_avg = train_df.groupby('Class')['Inflight service'].mean()
     train_df['Class_Service_Avg'] = train_df['Class'].map(class_avg)
     test_df['Class_Service_Avg'] = test_df['Class'].map(class_avg)
     train_df = encode_features(train_df)
     test_df = encode_features(test_df)
-    # dummies for Delay Level
+
     train_df = pd.get_dummies(train_df, columns=['Delay Level'], drop_first=True)
     test_df = pd.get_dummies(test_df, columns=['Delay Level'], drop_first=True)
-    # align columns
+
     train_df, test_df = train_df.align(test_df, join='left', axis=1, fill_value=0)
     return train_df, test_df, class_avg
 
@@ -200,7 +195,6 @@ def main():
             st.session_state['class_avg'] = class_avg
             st.warning("Feature engineering skipped. Please be aware that models may not perform well.")
 
-        # Store processed data in session state for later tabs
         st.session_state['train_proc'] = train_proc
         st.session_state['test_proc'] = test_proc
         st.success("Preprocessed data saved. Go to the Modeling tab to train models.")
@@ -209,7 +203,6 @@ def main():
     with tab4:
         st.subheader("Model Configuration & Training")
         
-        # Check if preprocessed data exists
         if 'train_proc' not in st.session_state:
             st.warning("Please run preprocessing first (in the Preprocessing tab).")
             st.stop()
@@ -217,22 +210,18 @@ def main():
         train_proc = st.session_state['train_proc'].copy()
         test_proc = st.session_state['test_proc'].copy()
         
-        # Ensure binary target exists
         if 'satisfaction_binary' not in train_proc.columns:
             train_proc = add_binary_target(train_proc)
         if 'satisfaction_binary' not in test_proc.columns:
             test_proc = add_binary_target(test_proc)
         
-        # Prepare X, y
         X = train_proc.drop(columns=['satisfaction', 'satisfaction_binary'])
         y = train_proc['satisfaction_binary']
         X_test = test_proc.drop(columns=['satisfaction', 'satisfaction_binary'])
         y_test = test_proc['satisfaction_binary']
         
-        # Split validation set
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
         
-        # Feature selection options
         st.subheader("Feature Selection")
         fs_method = st.selectbox("Select method", ["None", "Variance Threshold", "Mutual Information (k=20)",
                                                    "Forward Selection (k=20)", "Backward Selection (k=20)"])
@@ -274,7 +263,6 @@ def main():
             X_train_fs, X_val_fs, X_test_fs = X_train, X_val, X_test
             cols = X_train.columns
         
-        # Handle imbalance
         st.subheader("Handle Imbalance")
         imbalance_method = st.selectbox("Method", ["None", "SMOTE", "Class Weight (for RF/XGB/LR)"])
         class_weight = None
@@ -285,7 +273,6 @@ def main():
         elif imbalance_method == "Class Weight (for RF/XGB/LR)":
             class_weight = 'balanced'
         
-        # Model selection & hyperparameters
         st.subheader("Model Configuration")
         model_choice = st.selectbox("Choose model", ["Logistic Regression", "Random Forest", "XGBoost", "Gradient Boosting"])
         params = {}
@@ -314,7 +301,7 @@ def main():
         
         train_button = st.button("🚀 Train Model")
         if train_button:
-            # Initialize model
+
             if model_choice == "Logistic Regression":
                 model = LogisticRegression(max_iter=1000, random_state=42, C=params.get('C',1.0), class_weight=class_weight)
             elif model_choice == "Random Forest":
@@ -352,14 +339,14 @@ def main():
             report = classification_report(y_test, y_pred_test, output_dict=True)
             st.dataframe(pd.DataFrame(report).transpose())
             
-            # Confusion Matrix
+
             cm = confusion_matrix(y_test, y_pred_test)
             fig_cm, ax_cm = plt.subplots()
             sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax_cm)
             ax_cm.set_xlabel('Predicted'); ax_cm.set_ylabel('Actual')
             st.pyplot(fig_cm)
             
-            # ROC Curve
+
             if hasattr(model, "predict_proba"):
                 y_proba = model.predict_proba(X_test_fs)[:,1]
                 fpr, tpr, _ = roc_curve(y_test, y_proba)
@@ -371,7 +358,7 @@ def main():
                 ax_roc.legend()
                 st.pyplot(fig_roc)
             
-            # Save model and related objects for prediction tab
+
             st.session_state['trained_model'] = model
             st.session_state['model_cols'] = cols
             st.session_state['fs_method'] = fs_method
