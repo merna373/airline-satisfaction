@@ -216,6 +216,7 @@ def main():
             test_proc = add_binary_target(test_proc)
         
         X = train_proc.drop(columns=['satisfaction', 'satisfaction_binary'])
+        st.session_state['all_columns'] = X.columns
         y = train_proc['satisfaction_binary']
         X_test = test_proc.drop(columns=['satisfaction', 'satisfaction_binary'])
         y_test = test_proc['satisfaction_binary']
@@ -435,12 +436,12 @@ def main():
                 input_df = encode_features(input_df)
                 input_df = pd.get_dummies(input_df, columns=['Delay Level'], drop_first=True)
                 
-                model_cols = st.session_state['model_cols']
-                for col in model_cols:
+                all_columns = st.session_state['all_columns']
+                for col in all_columns:
                     if col not in input_df.columns:
                         input_df[col] = 0
-                input_df = input_df[model_cols]
-                
+                input_df = input_df[all_columns]
+
                 fs_method = st.session_state.get('fs_method', 'None')
                 if fs_method == "Variance Threshold" and st.session_state['selector'] is not None:
                     input_transformed = st.session_state['selector'].transform(input_df)
