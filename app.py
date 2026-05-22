@@ -287,7 +287,6 @@ if page == "🏠 Home":
     Use the sidebar to navigate through different sections.
     """)
 
-    st.image("https://img.freepik.com/free-vector/airplane-flying-illustration_23-2149447627.jpg", width=400)
 
 # ========================
 # Data Upload
